@@ -1,23 +1,10 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Laravel Products API Documentation",
-        "description": "API documentation for Products API",
-        "contact": {
-            "email": "admin@example.com"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
+        "title": "API de Productos",
+        "description": "API para gestionar productos",
         "version": "1.0.0"
     },
-    "servers": [
-        {
-            "url": "http://127.0.0.1:8000",
-            "description": "Local API Server"
-        }
-    ],
     "paths": {
         "/api/register": {
             "post": {
@@ -66,7 +53,7 @@
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Login a user",
+                "summary": "Log in a user",
                 "operationId": "222b2625838e3c57e017987f73598fda",
                 "requestBody": {
                     "required": true,
@@ -94,7 +81,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User logged in successfully"
+                        "description": "User authenticated successfully"
                     }
                 }
             }
@@ -104,11 +91,11 @@
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Logout a user",
+                "summary": "Log out a user",
                 "operationId": "ad65cbbd4e9f201619eae184a5961a98",
                 "responses": {
                     "200": {
-                        "description": "User logged out successfully"
+                        "description": "Session closed successfully"
                     }
                 }
             }
@@ -118,26 +105,19 @@
                 "tags": [
                     "Products"
                 ],
-                "summary": "List all products",
+                "summary": "Obtener lista de productos",
                 "operationId": "d97d1c3727cbac49708b85f7d11f7d58",
                 "responses": {
                     "200": {
-                        "description": "List of products",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ProductRequest"
-                                    }
-                                }
-                            }
-                        }
+                        "description": "Lista de productos obtenida exitosamente"
+                    },
+                    "401": {
+                        "description": "No autorizado"
                     }
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -145,33 +125,43 @@
                 "tags": [
                     "Products"
                 ],
-                "summary": "Create a new product",
+                "summary": "Crear un nuevo producto",
                 "operationId": "785644b7d7dd38af4b51dafd0fbc1b6d",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ProductRequest"
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    },
+                                    "stock": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "Product created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProductRequest"
-                                }
-                            }
-                        }
+                        "description": "Producto creado exitosamente"
+                    },
+                    "401": {
+                        "description": "No autorizado"
                     }
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -181,7 +171,7 @@
                 "tags": [
                     "Products"
                 ],
-                "summary": "Get a specific product",
+                "summary": "Obtener un producto específico",
                 "operationId": "c87fb2e4d617e7b36c712cad358acdb8",
                 "parameters": [
                     {
@@ -195,19 +185,15 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Product details",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProductRequest"
-                                }
-                            }
-                        }
+                        "description": "Producto encontrado exitosamente"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
                     }
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -215,7 +201,7 @@
                 "tags": [
                     "Products"
                 ],
-                "summary": "Update a product",
+                "summary": "Actualizar un producto existente",
                 "operationId": "416e4959a3919547eb609d87e3db9135",
                 "parameters": [
                     {
@@ -232,26 +218,36 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ProductRequest"
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "number"
+                                    },
+                                    "stock": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Product updated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProductRequest"
-                                }
-                            }
-                        }
+                        "description": "Producto actualizado exitosamente"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
                     }
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -259,7 +255,7 @@
                 "tags": [
                     "Products"
                 ],
-                "summary": "Delete a product",
+                "summary": "Eliminar un producto",
                 "operationId": "b49ce9f3cb168b233245548fb4ef36d3",
                 "parameters": [
                     {
@@ -272,26 +268,16 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Product deleted successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Product deleted successfully"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                    "204": {
+                        "description": "Producto eliminado exitosamente"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
                     }
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -299,34 +285,6 @@
     },
     "components": {
         "schemas": {
-            "ProductRequest": {
-                "required": [
-                    "name",
-                    "description",
-                    "price",
-                    "stock"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "example": "Product Name"
-                    },
-                    "description": {
-                        "type": "string",
-                        "example": "Product Description"
-                    },
-                    "price": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 99.99
-                    },
-                    "stock": {
-                        "type": "integer",
-                        "example": 100
-                    }
-                },
-                "type": "object"
-            },
             "Product": {
                 "required": [
                     "name",
@@ -341,11 +299,11 @@
                     },
                     "name": {
                         "type": "string",
-                        "example": "Product Name"
+                        "example": "Premium Product"
                     },
                     "description": {
                         "type": "string",
-                        "example": "Product Description"
+                        "example": "A quality product"
                     },
                     "price": {
                         "type": "number",
@@ -369,7 +327,7 @@
             }
         },
         "securitySchemes": {
-            "sanctum": {
+            "bearerAuth": {
                 "type": "http",
                 "bearerFormat": "JWT",
                 "scheme": "bearer"
@@ -383,7 +341,7 @@
         },
         {
             "name": "Products",
-            "description": "API Endpoints for product management"
+            "description": "Products"
         }
     ]
 }

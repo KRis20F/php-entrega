@@ -2,85 +2,70 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Product;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreProductRequest;
-use App\Http\Requests\UpdateProductRequest;
-use Illuminate\Http\JsonResponse;
+use App\Models\Product;
+use Illuminate\Http\Request;
 
-/**
- * @OA\Tag(
- *     name="Products",
- *     description="API Endpoints for managing products"
- * )
- * 
- * @OA\Schema(
- *     schema="ProductRequest",
- *     required={"name", "description", "price", "stock"},
- *     @OA\Property(property="name", type="string", example="Premium Product"),
- *     @OA\Property(property="description", type="string", example="A quality product"),
- *     @OA\Property(property="price", type="number", format="float", example=99.99),
- *     @OA\Property(property="stock", type="integer", example=100)
- * )
- */
 class ProductController extends Controller
 {
     /**
      * @OA\Get(
      *     path="/api/products",
-     *     summary="List all products",
+     *     summary="Obtener lista de productos",
      *     tags={"Products"},
-     *     security={{"sanctum": {}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="List of products",
-     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ProductRequest"))
+     *         description="Lista de productos obtenida exitosamente"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autorizado"
      *     )
      * )
      */
-    public function index(): JsonResponse
+    public function index()
     {
-        $products = Product::all();
-        return response()->json($products);
+        return Product::all();
     }
 
     /**
      * @OA\Post(
      *     path="/api/products",
-     *     summary="Create a new product",
+     *     summary="Crear un nuevo producto",
      *     tags={"Products"},
-     *     security={{"sanctum": {}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/ProductRequest")
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="price", type="number"),
+     *             @OA\Property(property="stock", type="integer")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Product created successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/ProductRequest")
+     *         description="Producto creado exitosamente"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autorizado"
      *     )
      * )
      */
-    public function store(StoreProductRequest $request): JsonResponse
+    public function store(Request $request)
     {
-        if (!$request->user() || !$request->user()->hasRole('admin')) {
-            return response()->json(['message' => 'Unauthorized - Admin role required'], 403);
-        }
-
-        try {
-            $product = Product::create($request->validated());
-            return response()->json(['data' => $product, 'message' => 'Product created successfully'], 201);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Error creating product', 'error' => $e->getMessage()], 500);
-        }
+        $product = Product::create($request->all());
+        return response()->json($product, 201);
     }
 
     /**
      * @OA\Get(
      *     path="/api/products/{id}",
-     *     summary="Get a specific product",
+     *     summary="Obtener un producto específico",
      *     tags={"Products"},
-     *     security={{"sanctum": {}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -89,22 +74,25 @@ class ProductController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Product details",
-     *         @OA\JsonContent(ref="#/components/schemas/ProductRequest")
+     *         description="Producto encontrado exitosamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado"
      *     )
      * )
      */
-    public function show(Product $product): JsonResponse
+    public function show(Product $product)
     {
-        return response()->json($product);
+        return $product;
     }
 
     /**
      * @OA\Put(
      *     path="/api/products/{id}",
-     *     summary="Update a product",
+     *     summary="Actualizar un producto existente",
      *     tags={"Products"},
-     *     security={{"sanctum": {}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -113,27 +101,35 @@ class ProductController extends Controller
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/ProductRequest")
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="price", type="number"),
+     *             @OA\Property(property="stock", type="integer")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Product updated successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/ProductRequest")
+     *         description="Producto actualizado exitosamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado"
      *     )
      * )
      */
-    public function update(UpdateProductRequest $request, Product $product): JsonResponse
+    public function update(Request $request, Product $product)
     {
-        $product->update($request->validated());
+        $product->update($request->all());
         return response()->json($product);
     }
 
     /**
      * @OA\Delete(
      *     path="/api/products/{id}",
-     *     summary="Delete a product",
+     *     summary="Eliminar un producto",
      *     tags={"Products"},
-     *     security={{"sanctum": {}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -141,17 +137,18 @@ class ProductController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
-     *         response=200,
-     *         description="Product deleted successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Product deleted successfully")
-     *         )
+     *         response=204,
+     *         description="Producto eliminado exitosamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado"
      *     )
      * )
      */
-    public function destroy(Product $product): JsonResponse
+    public function destroy(Product $product)
     {
         $product->delete();
-        return response()->json(['message' => 'Product deleted successfully']);
+        return response()->json(null, 204);
     }
 }
