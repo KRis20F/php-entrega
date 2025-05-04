@@ -11,7 +11,7 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Temporarily allow all authenticated users
+        return true; // Temporalmente permitir a todos los usuarios autenticados
     }
 
     /**
@@ -26,6 +26,21 @@ class UpdateProductRequest extends FormRequest
             'description' => 'sometimes|required|string',
             'price' => 'sometimes|required|numeric|min:0',
             'stock' => 'sometimes|required|integer|min:0',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'The product name is required',
+            'description.required' => 'The product description is required',
+            'price.required' => 'The product price is required',
+            'stock.required' => 'The product stock is required',
+            'price.min' => 'The price must be greater than 0',
+            'stock.min' => 'The stock must be greater than 0',
         ];
     }
 }

@@ -11,14 +11,14 @@ use Illuminate\Http\JsonResponse;
 /**
  * @OA\Tag(
  *     name="Products",
- *     description="API Endpoints for product management"
+ *     description="API Endpoints for managing products"
  * )
  * 
  * @OA\Schema(
  *     schema="ProductRequest",
  *     required={"name", "description", "price", "stock"},
- *     @OA\Property(property="name", type="string", example="Product Name"),
- *     @OA\Property(property="description", type="string", example="Product Description"),
+ *     @OA\Property(property="name", type="string", example="Premium Product"),
+ *     @OA\Property(property="description", type="string", example="A quality product"),
  *     @OA\Property(property="price", type="number", format="float", example=99.99),
  *     @OA\Property(property="stock", type="integer", example=100)
  * )

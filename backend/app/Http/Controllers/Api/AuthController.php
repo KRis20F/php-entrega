@@ -43,7 +43,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
         ]);
 
@@ -76,7 +76,7 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/api/login",
-     *     summary="Login a user",
+     *     summary="Log in a user",
      *     tags={"Authentication"},
      *     @OA\RequestBody(
      *         required=true,
@@ -88,7 +88,7 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="User logged in successfully"
+     *         description="User authenticated successfully"
      *     )
      * )
      */
@@ -99,16 +99,14 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'message' => ['The provided credentials are incorrect.'],
             ]);
         }
 
         $user = User::where('email', $request->email)->with('role')->first();
         $token = $user->createToken('auth_token')->plainTextToken;
-        // Forzar recarga de la relación por si acaso
-        $user->load('role');
 
         return response()->json([
             'access_token' => $token,
@@ -128,11 +126,11 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/api/logout",
-     *     summary="Logout a user",
+     *     summary="Log out a user",
      *     tags={"Authentication"},
      *     @OA\Response(
      *         response=200,
-     *         description="User logged out successfully"
+     *         description="Session closed successfully"
      *     )
      * )
      */
@@ -141,7 +139,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         
         return response()->json([
-            'message' => 'Successfully logged out'
+            'message' => 'Logged out successfully'
         ]);
     }
 }

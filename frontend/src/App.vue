@@ -1,45 +1,57 @@
 <template>
-  <div>
-    <nav class="navbar">
-      <div class="container nav-content">
-        <router-link to="/" class="nav-brand">
-          Products Management
-        </router-link>
-        <div class="flex items-center">
-          <template v-if="isAuthenticated">
-            <span class="text-secondary">{{ user?.name }}</span>
-            <button @click="logout" class="btn btn-primary ml-4">
+  <div class="min-h-screen bg-gradient-to-br from-[#1a1a35] via-[#2d1b69] to-[#1a1a35]">
+    <nav class="navbar" v-if="isAuthenticated">
+      <div class="navbar-container">
+        <div class="navbar-left">
+          <router-link to="/products" class="navbar-brand">
+            <span class="brand-text">Products App</span>
+          </router-link>
+        </div>
+        
+        <div class="navbar-right">
+          <div class="user-info">
+            <span class="user-name">{{ currentUser?.user?.name }}</span>
+            <button
+              @click="handleLogout"
+              class="logout-button"
+            >
               Logout
             </button>
-          </template>
+          </div>
         </div>
       </div>
     </nav>
 
-    <main class="container mt-4">
+    <main>
       <router-view></router-view>
     </main>
   </div>
 </template>
 
-<script setup>
-import { useAuthStore } from './stores/auth'
-import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+<script>
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import AuthService from './services/auth.service';
+import './assets/styles/navbar.css';
 
-const router = useRouter()
-const authStore = useAuthStore()
-const { user, isAuthenticated } = storeToRefs(authStore)
+export default {
+  name: 'App',
+  setup() {
+    const router = useRouter();
 
-const logout = async () => {
-  await authStore.logout()
-  router.push('/login')
-}
+    const isAuthenticated = computed(() => !!AuthService.getCurrentUser());
+    const currentUser = computed(() => AuthService.getCurrentUser());
 
-onMounted(async () => {
-  if (!isAuthenticated.value) {
-    router.push('/login')
-  }
-})
+    const handleLogout = () => {
+      AuthService.logout();
+      router.push('/login');
+    };
+
+    return {
+      isAuthenticated,
+      currentUser,
+      handleLogout,
+    };
+  },
+};
 </script> 

@@ -15,7 +15,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Los atributos que son asignables masivamente.
      *
      * @var list<string>
      */
@@ -27,7 +27,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Los atributos que deben estar ocultos para la serialización.
      *
      * @var list<string>
      */
@@ -37,7 +37,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * Los atributos que deben ser convertidos.
      *
      * @var array<string, string>
      */
@@ -53,18 +53,19 @@ class User extends Authenticatable
 
     public function hasRole(string $roleName): bool
     {
-        logger()->info('Checking role', ['user_id' => $this->id, 'role_id' => $this->role_id, 'required_role' => $roleName]);
+        logger()->info('Checking role', [
+            'user_id' => $this->id, 
+            'role_id' => $this->role_id, 
+            'required_role' => $roleName
+        ]);
 
-        // Obtener el rol directamente de la base de datos
         $role = Role::find($this->role_id);
 
-        // Verificar si el usuario tiene un rol asignado
         if (!$role) {
             logger()->warning('User has no role', ['user_id' => $this->id]);
             return false;
         }
 
-        // Verificar si el rol coincide
         $hasRole = $role->name === $roleName;
         logger()->info('Role check result', [
             'user_id' => $this->id,

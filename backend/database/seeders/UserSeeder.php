@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         $adminRole = Role::where('name', 'admin')->first();
         $userRole = Role::where('name', 'user')->first();
 
-        // Create admin user / Crear usuario administrador
+        // Crear usuario administrador
         User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
             'role_id' => $adminRole ? $adminRole->id : null
         ]);
 
-        // Create regular user / Crear usuario normal
+        // Crear usuario normal
         User::create([
             'name' => 'Regular User',
             'email' => 'user@example.com',

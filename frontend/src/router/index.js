@@ -1,28 +1,39 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import Login from '../views/Login.vue'
+import Products from '../views/Products.vue'
+import AuthService from '../services/auth.service'
+
+const routes = [
+  {
+    path: '/',
+    redirect: '/products'
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+    meta: { requiresGuest: true }
+  },
+  {
+    path: '/products',
+    name: 'Products',
+    component: Products,
+    meta: { requiresAuth: true }
+  }
+]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('../views/LoginView.vue')
-    },
-    {
-      path: '/',
-      name: 'products',
-      component: () => import('../views/ProductsView.vue'),
-      meta: { requiresAuth: true }
-    }
-  ]
+  routes
 })
 
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
-  
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+  const isAuthenticated = !!AuthService.getCurrentUser()
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')
+  } else if (to.meta.requiresGuest && isAuthenticated) {
+    next('/products')
   } else {
     next()
   }
